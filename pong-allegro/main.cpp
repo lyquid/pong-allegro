@@ -63,21 +63,13 @@ int main(int argc, int *args[]) {
       case ALLEGRO_EVENT_TIMER:
         // ball movement logic
         ball.cx += ball.dx;
+        if ((ball.cx < ball.radius) || (ball.cx + ball.radius > kScreenWidth)) {
+          ball.cx -= ball.dx;
+          ball.dx *= -1;
+        }
         ball.cy += ball.dy;
-        if (ball.cx < ball.radius) {
-          ball.cx = ball.radius;
-          ball.dx *= -1;
-        }
-        if (ball.cx > kScreenWidth - ball.radius) {
-          ball.cx -= (ball.cx - (kScreenWidth - ball.radius));
-          ball.dx *= -1;
-        }
-        if (ball.cy < ball.radius) {
-          ball.cy = ball.radius;
-          ball.dy *= -1;
-        }
-        if (ball.cy > kScreenHeight - ball.radius) {
-          ball.cy -= (ball.cy - (kScreenHeight - ball.radius));
+        if ((ball.cy < ball.radius) || (ball.cy + ball.radius > kScreenHeight)) {
+          ball.cy -= ball.dy;
           ball.dy *= -1;
         }
         // player control logic
