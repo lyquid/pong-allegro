@@ -7,17 +7,18 @@
 #include "init.h"
 
 typedef struct Player { 
-  int length = 150;
+  int length = 150,
+      score = 0;
   float x = kScreenWidth * 0.09, 
-        y = (kScreenHeight / 2) - (length / 2);
-  float dx, dy;
-  int score = 0;
+        y = (kScreenHeight / 2) - (length / 2),
+        dx = 0.0, 
+        dy = 6.0;
 } Player; 
 
 typedef struct Ball { 
   float cx = kScreenWidth / 2, 
-        cy = kScreenHeight / 2;
-  float dx = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4,
+        cy = kScreenHeight / 2,
+        dx = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4,
         dy = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4;
   int radius = 10;
 } Ball; 
@@ -40,6 +41,14 @@ int main(int argc, int *args[]) {
   al_register_event_source(queue, al_get_timer_event_source(fps_timer));
   ALLEGRO_EVENT event;
 
+  // keyboard stuff
+  enum KeyStatus {
+    kKeySeen = 1,
+    kKeyReleased = 2
+  };
+  unsigned char key[ALLEGRO_KEY_MAX];
+  memset(key, 0, sizeof(key)); // zeroes all the contents of the array
+
   bool redraw = true;
   bool quit = false;
 
@@ -48,7 +57,7 @@ int main(int argc, int *args[]) {
   while (!quit) {
     al_wait_for_event(queue, &event);
 
-    // event handling
+    // event handling switch
     switch (event.type) {
       // the fps event
       case ALLEGRO_EVENT_TIMER:
@@ -71,8 +80,33 @@ int main(int argc, int *args[]) {
           ball.cy -= (ball.cy - (kScreenHeight - ball.radius));
           ball.dy *= -1;
         }
+        // player control logic
+        if (key[ALLEGRO_KEY_UP] || key[ALLEGRO_KEY_W])
+          player1.y -= player1.dy;
+        if (key[ALLEGRO_KEY_DOWN] || key[ALLEGRO_KEY_S])
+          player1.y += player1.dy;
+        // player movement limits
+        if (player1.y < 0) 
+          player1.y = 0;
+        if (player1.y > kScreenHeight - player1.length) 
+          player1.y = kScreenHeight - player1.length;
+
+        // ESC key logic
+        if (key[ALLEGRO_KEY_ESCAPE]) quit = true;
+
+        for(int i = 0; i < ALLEGRO_KEY_MAX; i++)
+          key[i] &= kKeySeen;
+
         redraw = true;
         break;
+      // look here for an explanation: 
+      // https://github.com/liballeg/allegro_wiki/wiki/Allegro-Vivace%3A-Input
+      case ALLEGRO_EVENT_KEY_DOWN:
+        key[event.keyboard.keycode] = kKeySeen | kKeyReleased;
+        break;
+      case ALLEGRO_EVENT_KEY_UP:
+        key[event.keyboard.keycode] &= kKeyReleased;
+        break;  
       // X from the window quits
       case ALLEGRO_EVENT_DISPLAY_CLOSE:
         quit = true;
