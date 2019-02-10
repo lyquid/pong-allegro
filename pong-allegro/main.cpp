@@ -5,7 +5,8 @@
 #include "config.h"
 #include "init.h"
 
-bool checkCollision(Ball, Player);
+bool checkCollision(Ball, Player, Player);
+void checkPlayerMovementLimits(Player *);
 
 int main(int argc, int *args[]) {
   srand(time(NULL));
@@ -18,6 +19,8 @@ int main(int argc, int *args[]) {
   init(&disp, &queue, &font, &fps_timer);
   Ball ball;
   Player player1;
+  Player player2;
+  player2.x = (kScreenWidth * 0.90) - (player2.width / 2);
 
   // event listeners
   al_register_event_source(queue, al_get_display_event_source(disp));
@@ -48,25 +51,37 @@ int main(int argc, int *args[]) {
       case ALLEGRO_EVENT_TIMER:
         // ball movement logic
         ball.cx += ball.dx;
-        if ((ball.cx < ball.radius) || (ball.cx + ball.radius > kScreenWidth) || (checkCollision(ball, player1))) {
+        if ((ball.cx < ball.radius) || (ball.cx + ball.radius > kScreenWidth) || (checkCollision(ball, player1, player2))) {
           ball.cx -= ball.dx;
           ball.dx *= -1;
         }
         ball.cy += ball.dy;
-        if ((ball.cy < ball.radius) || (ball.cy + ball.radius > kScreenHeight) || (checkCollision(ball, player1))) {
+        if ((ball.cy < ball.radius) || (ball.cy + ball.radius > kScreenHeight) || (checkCollision(ball, player1, player2))) {
           ball.cy -= ball.dy;
           ball.dy *= -1;
         }
         // player control logic
-        if (key[ALLEGRO_KEY_UP] || key[ALLEGRO_KEY_W])
-          player1.y -= player1.dy;
-        if (key[ALLEGRO_KEY_DOWN] || key[ALLEGRO_KEY_S])
-          player1.y += player1.dy;
+        /* switch (key[]) {
+          case ALLEGRO_KEY_W:
+            player1.y -= player1.dy;
+            break;
+          case ALLEGRO_KEY_UP:
+            player2.y -= player2.dy;
+            break;
+          case ALLEGRO_KEY_S:
+            player1.y -= player1.dy;
+            break;
+          case ALLEGRO_KEY_DOWN:
+            player2.y -= player2.dy;
+            break;
+        } */
+        if (key[ALLEGRO_KEY_W]) player1.y -= player1.dy;
+        if (key[ALLEGRO_KEY_UP]) player2.y -= player2.dy;
+        if (key[ALLEGRO_KEY_S]) player1.y += player1.dy;
+        if (key[ALLEGRO_KEY_DOWN]) player2.y += player2.dy; 
         // player movement limits
-        if (player1.y < 0) 
-          player1.y = 0;
-        if (player1.y > kScreenHeight - player1.length) 
-          player1.y = kScreenHeight - player1.length;
+        checkPlayerMovementLimits(&player1);
+        checkPlayerMovementLimits(&player2);
 
         // ESC key logic
         if (key[ALLEGRO_KEY_ESCAPE]) quit = true;
@@ -98,6 +113,8 @@ int main(int argc, int *args[]) {
       al_draw_filled_circle(ball.cx, ball.cy, ball.radius, al_map_rgb_f(1, 1, 1));
       // player 1
       al_draw_filled_rectangle(player1.x, player1.y, player1.x + player1.width, player1.y + player1.length, al_map_rgb_f(1, 1, 1));
+      // player 2
+      al_draw_filled_rectangle(player2.x, player2.y, player2.x + player2.width, player2.y + player2.length, al_map_rgb_f(1, 1, 1));
       al_flip_display();
       redraw = false;
     }
@@ -111,23 +128,43 @@ int main(int argc, int *args[]) {
   return 0;
 }
 
-bool checkCollision(Ball b, Player p1) {
+bool checkCollision(Ball b, Player p1, Player p2) {
+  bool p1_collision = true;
+  bool p2_collision = true;
   // ball sides (todo: improve this)
   int b_left   = b.cx - b.radius,
       b_right  = b.cx + b.radius,
       b_top    = b.cy - b.radius,
       b_bottom = b.cy + b.radius;
-  // player sides
+  // player1 sides
   int p1_left   = p1.x,
       p1_right  = p1.x + p1.width,
       p1_top    = p1.y,
       p1_bottom = p1.y + p1.length;
-
+  // player2 sides
+  int p2_left   = p2.x,
+      p2_right  = p2.x + p2.width,
+      p2_top    = p2.y,
+      p2_bottom = p2.y + p2.length;
+  // collision check with player1
   if ( b_left >= p1_right 
     || b_right <= p1_left
     || b_top >= p1_bottom
-    || b_bottom <= p1_top ) 
-    return false;
+    || b_bottom <= p1_top )
+      p1_collision = false;
+  // collision check with player2
+  if ( b_left >= p2_right 
+    || b_right <= p2_left
+    || b_top >= p2_bottom
+    || b_bottom <= p2_top )
+      p2_collision = false;
+  
+  return (p1_collision || p2_collision) ? true : false;
+}
 
-  return true;
+void checkPlayerMovementLimits(Player *pl) {
+  if (pl->y < 0) 
+    pl->y = 0;
+  if (pl->y > kScreenHeight - pl->length) 
+    pl->y = kScreenHeight - pl->length;
 }

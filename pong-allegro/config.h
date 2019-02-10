@@ -11,7 +11,7 @@ typedef struct Player {
   int length = 150,
       width = 10,
       score = 0;
-  float x = kScreenWidth * 0.09, 
+  float x = (kScreenWidth * 0.10) - (width / 2), 
         y = (kScreenHeight / 2) - (length / 2),
         dx = 0.0, 
         dy = 6.0;
