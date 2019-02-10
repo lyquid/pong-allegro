@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
@@ -6,22 +5,7 @@
 #include "config.h"
 #include "init.h"
 
-typedef struct Player { 
-  int length = 150,
-      score = 0;
-  float x = kScreenWidth * 0.09, 
-        y = (kScreenHeight / 2) - (length / 2),
-        dx = 0.0, 
-        dy = 6.0;
-} Player; 
-
-typedef struct Ball { 
-  float cx = kScreenWidth / 2, 
-        cy = kScreenHeight / 2,
-        dx = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4,
-        dy = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4;
-  int radius = 10;
-} Ball; 
+bool checkCollision(Ball, Player);
 
 int main(int argc, int *args[]) {
   srand(time(NULL));
@@ -47,7 +31,8 @@ int main(int argc, int *args[]) {
     kKeyReleased = 2
   };
   unsigned char key[ALLEGRO_KEY_MAX];
-  memset(key, 0, sizeof(key)); // zeroes all the contents of the array
+  // zeroes all the contents of the array
+  memset(key, 0, sizeof(key)); 
 
   bool redraw = true;
   bool quit = false;
@@ -63,12 +48,12 @@ int main(int argc, int *args[]) {
       case ALLEGRO_EVENT_TIMER:
         // ball movement logic
         ball.cx += ball.dx;
-        if ((ball.cx < ball.radius) || (ball.cx + ball.radius > kScreenWidth)) {
+        if ((ball.cx < ball.radius) || (ball.cx + ball.radius > kScreenWidth) || (checkCollision(ball, player1))) {
           ball.cx -= ball.dx;
           ball.dx *= -1;
         }
         ball.cy += ball.dy;
-        if ((ball.cy < ball.radius) || (ball.cy + ball.radius > kScreenHeight)) {
+        if ((ball.cy < ball.radius) || (ball.cy + ball.radius > kScreenHeight) || (checkCollision(ball, player1))) {
           ball.cy -= ball.dy;
           ball.dy *= -1;
         }
@@ -112,7 +97,7 @@ int main(int argc, int *args[]) {
       // ball
       al_draw_filled_circle(ball.cx, ball.cy, ball.radius, al_map_rgb_f(1, 1, 1));
       // player 1
-      al_draw_filled_rectangle(player1.x, player1.y, player1.x + 10, player1.y + player1.length, al_map_rgb_f(1, 1, 1));
+      al_draw_filled_rectangle(player1.x, player1.y, player1.x + player1.width, player1.y + player1.length, al_map_rgb_f(1, 1, 1));
       al_flip_display();
       redraw = false;
     }
@@ -124,4 +109,25 @@ int main(int argc, int *args[]) {
   al_destroy_event_queue(queue);
 
   return 0;
+}
+
+bool checkCollision(Ball b, Player p1) {
+  // ball sides (todo: improve this)
+  int b_left   = b.cx - b.radius,
+      b_right  = b.cx + b.radius,
+      b_top    = b.cy - b.radius,
+      b_bottom = b.cy + b.radius;
+  // player sides
+  int p1_left   = p1.x,
+      p1_right  = p1.x + p1.width,
+      p1_top    = p1.y,
+      p1_bottom = p1.y + p1.length;
+
+  if ( b_left >= p1_right 
+    || b_right <= p1_left
+    || b_top >= p1_bottom
+    || b_bottom <= p1_top ) 
+    return false;
+
+  return true;
 }
