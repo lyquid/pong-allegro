@@ -51,7 +51,15 @@ int main(int argc, int *args[]) {
       case ALLEGRO_EVENT_TIMER:
         // ball movement logic
         ball.cx += ball.dx;
-        if ((ball.cx < ball.radius) || (ball.cx + ball.radius > kScreenWidth) || (checkCollision(ball, player1, player2))) {
+        if (ball.cx < ball.radius) {
+          ++player2.score;
+          ball = Ball();
+        }
+        if (ball.cx + ball.radius > kScreenWidth) {
+          ++player1.score;
+          ball = Ball();
+        }
+        if (checkCollision(ball, player1, player2)) {
           ball.cx -= ball.dx;
           ball.dx *= -1;
         }
@@ -108,13 +116,26 @@ int main(int argc, int *args[]) {
     if (redraw && al_is_event_queue_empty(queue)) {
       al_clear_to_color(al_map_rgb(0, 0, 0));
       // score
-      al_draw_textf(font, al_map_rgb_f(1, 1, 1), kScreenWidth / 2, 8, ALLEGRO_ALIGN_CENTER, "Score: %d", player1.score);
+      al_draw_textf(
+        font, al_map_rgb_f(1, 1, 1), 
+        kScreenWidth / 2, 8, 
+        ALLEGRO_ALIGN_CENTER, 
+        "%d - SCORES - %d", player1.score, player2.score
+      );
       // ball
       al_draw_filled_circle(ball.cx, ball.cy, ball.radius, al_map_rgb_f(1, 1, 1));
       // player 1
-      al_draw_filled_rectangle(player1.x, player1.y, player1.x + player1.width, player1.y + player1.length, al_map_rgb_f(1, 1, 1));
+      al_draw_filled_rectangle(
+        player1.x, player1.y, 
+        player1.x + player1.width, player1.y + player1.length, 
+        al_map_rgb_f(1, 1, 1)
+      );
       // player 2
-      al_draw_filled_rectangle(player2.x, player2.y, player2.x + player2.width, player2.y + player2.length, al_map_rgb_f(1, 1, 1));
+      al_draw_filled_rectangle(
+        player2.x, player2.y, 
+        player2.x + player2.width, player2.y + player2.length, 
+        al_map_rgb_f(1, 1, 1)
+      );
       al_flip_display();
       redraw = false;
     }
