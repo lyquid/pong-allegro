@@ -17,11 +17,13 @@ typedef struct Player {
 typedef struct Ball { 
   float cx = kScreenWidth / 2, 
         cy = kScreenHeight / 2;
-  float dcx, dcy;
+  float dx = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4,
+        dy = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4;
   int radius = 10;
 } Ball; 
 
 int main(int argc, int *args[]) {
+  srand(time(NULL));
   ALLEGRO_DISPLAY *disp = NULL;
   ALLEGRO_EVENT_QUEUE *queue = NULL;
   ALLEGRO_FONT *font = NULL;
@@ -50,10 +52,28 @@ int main(int argc, int *args[]) {
     switch (event.type) {
       // the fps event
       case ALLEGRO_EVENT_TIMER:
+        // ball movement logic
+        ball.cx += ball.dx;
+        ball.cy += ball.dy;
+        if (ball.cx < ball.radius) {
+          ball.cx = ball.radius;
+          ball.dx *= -1;
+        }
+        if (ball.cx > kScreenWidth - ball.radius) {
+          ball.cx -= (ball.cx - (kScreenWidth - ball.radius));
+          ball.dx *= -1;
+        }
+        if (ball.cy < ball.radius) {
+          ball.cy = ball.radius;
+          ball.dy *= -1;
+        }
+        if (ball.cy > kScreenHeight - ball.radius) {
+          ball.cy -= (ball.cy - (kScreenHeight - ball.radius));
+          ball.dy *= -1;
+        }
         redraw = true;
         break;
-      // any key or X'd quits
-      case ALLEGRO_EVENT_KEY_DOWN:
+      // X from the window quits
       case ALLEGRO_EVENT_DISPLAY_CLOSE:
         quit = true;
         break;
@@ -61,8 +81,11 @@ int main(int argc, int *args[]) {
     // draw and update display
     if (redraw && al_is_event_queue_empty(queue)) {
       al_clear_to_color(al_map_rgb(0, 0, 0));
+      // score
       al_draw_textf(font, al_map_rgb_f(1, 1, 1), kScreenWidth / 2, 8, ALLEGRO_ALIGN_CENTER, "Score: %d", player1.score);
+      // ball
       al_draw_filled_circle(ball.cx, ball.cy, ball.radius, al_map_rgb_f(1, 1, 1));
+      // player 1
       al_draw_filled_rectangle(player1.x, player1.y, player1.x + 10, player1.y + player1.length, al_map_rgb_f(1, 1, 1));
       al_flip_display();
       redraw = false;
