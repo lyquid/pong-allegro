@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include <allegro5/allegro5.h>
+#include <allegro5/allegro_audio.h>
+ #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 
@@ -10,6 +12,7 @@ void init(
   ALLEGRO_DISPLAY     **disp, 
   ALLEGRO_EVENT_QUEUE **queue, 
   ALLEGRO_FONT        **font, 
+  ALLEGRO_SAMPLE      **pong,
   ALLEGRO_TIMER       **timer
 );
 

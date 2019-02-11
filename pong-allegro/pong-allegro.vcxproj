@@ -73,6 +73,8 @@
     <Allegro_LibraryType>DynamicDebug</Allegro_LibraryType>
     <Allegro_AddonPrimitives>true</Allegro_AddonPrimitives>
     <Allegro_AddonFont>true</Allegro_AddonFont>
+    <Allegro_AddonAudio>true</Allegro_AddonAudio>
+    <Allegro_AddonAcodec>true</Allegro_AddonAcodec>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -128,6 +130,9 @@
   <ItemGroup>
     <ClInclude Include="config.h" />
     <ClInclude Include="init.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="assets\pong.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

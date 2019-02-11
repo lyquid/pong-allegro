@@ -1,4 +1,6 @@
 #include <allegro5/allegro5.h>
+#include <allegro5/allegro_audio.h>
+ #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 
@@ -13,10 +15,11 @@ int main(int argc, int *args[]) {
   ALLEGRO_DISPLAY *disp = NULL;
   ALLEGRO_EVENT_QUEUE *queue = NULL;
   ALLEGRO_FONT *font = NULL;
+  ALLEGRO_SAMPLE *pong = NULL;
   ALLEGRO_TIMER *fps_timer = NULL;
 
   // initialization
-  init(&disp, &queue, &font, &fps_timer);
+  init(&disp, &queue, &font, &pong, &fps_timer);
   Ball ball;
   Player player1;
   Player player2;
@@ -51,20 +54,24 @@ int main(int argc, int *args[]) {
       case ALLEGRO_EVENT_TIMER:
         // ball movement logic
         ball.cx += ball.dx;
+        // exit from the left side
         if (ball.cx < ball.radius) {
           ++player2.score;
           ball = Ball();
         }
+        // exit from the right side
         if (ball.cx + ball.radius > kScreenWidth) {
           ++player1.score;
           ball = Ball();
         }
         if (checkCollision(ball, player1, player2)) {
+          al_play_sample(pong, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
           ball.cx -= ball.dx;
           ball.dx *= -1;
         }
         ball.cy += ball.dy;
         if ((ball.cy < ball.radius) || (ball.cy + ball.radius > kScreenHeight) || (checkCollision(ball, player1, player2))) {
+          al_play_sample(pong, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
           ball.cy -= ball.dy;
           ball.dy *= -1;
         }
@@ -141,6 +148,7 @@ int main(int argc, int *args[]) {
     }
   }
   // destroy
+  al_destroy_sample(pong);
   al_destroy_font(font);
   al_destroy_display(disp);
   al_destroy_timer(fps_timer);
