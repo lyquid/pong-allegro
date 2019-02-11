@@ -124,12 +124,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="init.cpp" />
+    <ClCompile Include="classes\game.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="classes\game.h" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="init.h" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="assets\pong.wav" />
