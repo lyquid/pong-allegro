@@ -124,10 +124,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="classes\ball.cpp" />
     <ClCompile Include="classes\game.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="classes\ball.h" />
     <ClInclude Include="classes\game.h" />
     <ClInclude Include="config.h" />
   </ItemGroup>

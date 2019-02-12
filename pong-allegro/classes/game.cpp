@@ -1,39 +1,4 @@
-#include "../config.h"
 #include "game.h"
-
-bool Game::checkCollision(Ball b, Player p1, Player p2) {
-  bool p1_collision = true;
-  bool p2_collision = true;
-  // ball sides (todo: improve this)
-  int b_left   = b.cx - b.radius,
-      b_right  = b.cx + b.radius,
-      b_top    = b.cy - b.radius,
-      b_bottom = b.cy + b.radius;
-  // player1 sides
-  int p1_left   = p1.x,
-      p1_right  = p1.x + p1.width,
-      p1_top    = p1.y,
-      p1_bottom = p1.y + p1.length;
-  // player2 sides
-  int p2_left   = p2.x,
-      p2_right  = p2.x + p2.width,
-      p2_top    = p2.y,
-      p2_bottom = p2.y + p2.length;
-  // collision check with player1
-  if ( b_left >= p1_right 
-    || b_right <= p1_left
-    || b_top >= p1_bottom
-    || b_bottom <= p1_top )
-      p1_collision = false;
-  // collision check with player2
-  if ( b_left >= p2_right 
-    || b_right <= p2_left
-    || b_top >= p2_bottom
-    || b_bottom <= p2_top )
-      p2_collision = false;
-  
-  return (p1_collision || p2_collision) ? true : false;
-}
 
 void Game::checkPlayerMovementLimits(Player *pl) {
   if (pl->y < 0) 
@@ -56,44 +21,8 @@ void Game::handleEvents() {
   switch (event.type) {
     // the fps event
     case ALLEGRO_EVENT_TIMER:
-      // ball movement logic
-      ball.cx += ball.dx;
-      // exit from the left side
-      if (ball.cx < ball.radius) {
-        ++player2.score;
-        ball = Ball();
-      }
-      // exit from the right side
-      if (ball.cx + ball.radius > kScreenWidth) {
-        ++player1.score;
-        ball = Ball();
-      }
-      if (checkCollision(ball, player1, player2)) {
-        al_play_sample(pong, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-        ball.cx -= ball.dx;
-        ball.dx *= -1;
-      }
-      ball.cy += ball.dy;
-      if ((ball.cy < ball.radius) || (ball.cy + ball.radius > kScreenHeight) || (checkCollision(ball, player1, player2))) {
-        al_play_sample(pong, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-        ball.cy -= ball.dy;
-        ball.dy *= -1;
-      }
+      ball.move();
       // player control logic
-      /* switch (key[]) {
-        case ALLEGRO_KEY_W:
-          player1.y -= player1.dy;
-          break;
-        case ALLEGRO_KEY_UP:
-          player2.y -= player2.dy;
-          break;
-        case ALLEGRO_KEY_S:
-          player1.y -= player1.dy;
-          break;
-        case ALLEGRO_KEY_DOWN:
-          player2.y -= player2.dy;
-          break;
-      } */
       if (key[ALLEGRO_KEY_W]) player1.y -= player1.dy;
       if (key[ALLEGRO_KEY_UP]) player2.y -= player2.dy;
       if (key[ALLEGRO_KEY_S]) player1.y += player1.dy;
@@ -101,7 +30,6 @@ void Game::handleEvents() {
       // player movement limits
       checkPlayerMovementLimits(&player1);
       checkPlayerMovementLimits(&player2);
-
       // ESC key logic
       if (key[ALLEGRO_KEY_ESCAPE]) running = false;
 
@@ -198,5 +126,30 @@ void Game::render() {
     );
     al_flip_display();
     redraw = false;
+  }
+}
+
+void Game::update() {
+
+  if(ball.exitLeft()) {
+    ++player2.score;
+    ball = Ball();
+  }
+  
+  if(ball.exitRight()) {
+    ++player1.score;
+    ball = Ball();
+  }
+
+  if (ball.checkCollision(player1, player2)) {
+    al_play_sample(pong, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+    ball.cx -= ball.dx;
+    ball.dx *= -1;
+  }
+
+  if ((ball.cy < ball.radius) || (ball.cy + ball.radius > kScreenHeight) || (ball.checkCollision(player1, player2))) {
+    al_play_sample(pong, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+    ball.cy -= ball.dy;
+    ball.dy *= -1;
   }
 }

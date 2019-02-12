@@ -8,6 +8,7 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 
+#include "ball.h"
 #include "../config.h"
 
 class Game {
@@ -25,10 +26,9 @@ class Game {
     bool isRunning();
     void registerEvents();
     void render(); 
+    void update();
 
   private:
-
-    bool checkCollision(Ball, Player, Player);
     void checkPlayerMovementLimits(Player *);
     void mustInit(bool test, const char *desc);
 

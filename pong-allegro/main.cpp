@@ -12,6 +12,7 @@ int main(int argc, int *args[]) {
 
   while (game->isRunning()) {
     game->handleEvents();
+    game->update();
     game->render();
   }
   game->clean();
