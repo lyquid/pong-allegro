@@ -42,7 +42,10 @@ bool Ball::exitRight() {
   return (cx + radius > kScreenWidth) ? true: false;
 }
 
-void Ball::move() {
-  cx += dx;
+void Ball::moveY() {
   cy += dy;
+}
+
+void Ball::moveX() {
+  cx += dx;
 }

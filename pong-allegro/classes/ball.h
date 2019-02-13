@@ -19,7 +19,8 @@ class Ball {
     bool checkCollision(Player p1, Player p2);
     bool exitLeft();
     bool exitRight();
-    void move();
+    void moveY();
+    void moveX();
 
     float cx, cy,
           dx, dy;
