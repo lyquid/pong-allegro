@@ -34,6 +34,10 @@ bool Ball::checkCollision(Player p1, Player p2) {
   return (p1_collision || p2_collision) ? true : false;
 }
 
+bool Ball::exitBottom() {
+  return (cy + radius > kScreenHeight) ? true : false;
+}
+
 bool Ball::exitLeft() {
   return (cx < radius) ? true : false;
 }
@@ -42,10 +46,24 @@ bool Ball::exitRight() {
   return (cx + radius > kScreenWidth) ? true: false;
 }
 
-void Ball::moveY() {
-  cy += dy;
+bool Ball::exitTop() {
+  return (cy < radius) ? true : false;
+}
+
+void Ball::invertX() {
+  cx -= dx;
+  dx *= -1;
+}
+
+void Ball::invertY() {
+  cy -= dy;
+  dy *= -1;
 }
 
 void Ball::moveX() {
   cx += dx;
+}
+
+void Ball::moveY() {
+  cy += dy;
 }

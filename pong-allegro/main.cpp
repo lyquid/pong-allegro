@@ -2,13 +2,12 @@
 
 Game *game = NULL;
 
-int main(int argc, int *args[]) {
+int main(int argc, char *argv[]) {
   
   srand(time(NULL));
 
   game = new Game();
   game->init();
-  game->registerEvents();
 
   while (game->isRunning()) {
     game->handleEvents();

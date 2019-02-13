@@ -79,6 +79,8 @@ void Game::init() {
   mustInit(fps_timer, "timer");
   al_start_timer(fps_timer);
 
+  registerEvents();
+
   running = true;
 }
 
@@ -107,7 +109,7 @@ void Game::render() {
       font, al_map_rgb_f(1, 1, 1), 
       kScreenWidth / 2, 8, 
       ALLEGRO_ALIGN_CENTER, 
-      "%d - SCORES - %d", player1.score, player2.score
+      "%d - SCORE - %d", player1.score, player2.score
     );
     // ball
     al_draw_filled_circle(ball.cx, ball.cy, ball.radius, al_map_rgb_f(1, 1, 1));
@@ -129,25 +131,25 @@ void Game::render() {
 }
 
 void Game::update() {
-  ball.moveX();
-  if(ball.exitLeft()) {
-    ++player2.score;
-    ball = Ball();
-  }
-  if(ball.exitRight()) {
-    ++player1.score;
-    ball = Ball();
-  }
-  if (ball.checkCollision(player1, player2)) {
-    al_play_sample(pong, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-    ball.cx -= ball.dx;
-    ball.dx *= -1;
-  }
+  if (redraw && al_is_event_queue_empty(queue)) {
+    ball.moveX();
+    if(ball.exitLeft()) {
+      ++player2.score;
+      ball = Ball();
+    }
+    if(ball.exitRight()) {
+      ++player1.score;
+      ball = Ball();
+    }
+    if (ball.checkCollision(player1, player2)) {
+      al_play_sample(pong, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+      ball.invertX();
+    }
 
-  ball.moveY();
-  if ((ball.cy < ball.radius) || (ball.cy + ball.radius > kScreenHeight) || (ball.checkCollision(player1, player2))) {
-    al_play_sample(pong, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-    ball.cy -= ball.dy;
-    ball.dy *= -1;
+    ball.moveY();
+    if (ball.exitTop() || ball.exitBottom() || ball.checkCollision(player1, player2)) {
+      al_play_sample(pong, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+      ball.invertY();
+    }
   }
 }

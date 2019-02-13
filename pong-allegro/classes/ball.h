@@ -17,10 +17,14 @@ class Ball {
     ~Ball() {}
 
     bool checkCollision(Player p1, Player p2);
+    bool exitBottom();
     bool exitLeft();
     bool exitRight();
-    void moveY();
+    bool exitTop();
+    void invertX();
+    void invertY();
     void moveX();
+    void moveY();
 
     float cx, cy,
           dx, dy;
